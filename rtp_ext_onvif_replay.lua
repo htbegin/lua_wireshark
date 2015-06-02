@@ -10,14 +10,20 @@ local onvif_replay_proto = Proto("onvif", "ONVIF Replay")
 
 -- ProtoField.new(name, abbr, type, [voidstring], [base], [mask], [descr])
 -- base: one of BASE_, or field bit-width if FT_BOOLEAN and non-zero bitmask (_header_field_info)
-local ntp_sec = ProtoField.new("NTP Second", "onvif.sec", ftypes.UINT32, nil, BASE.DEC_HEX)
-local ntp_nsec = ProtoField.new("NTP Nanosecond", "onvif.nsec", ftypes.UINT32, nil, BASE.DEC_HEX)
+local ntp_sec = ProtoField.new("NTP Second", "onvif.sec", ftypes.UINT32, nil, base.DEC_HEX)
+local ntp_nsec = ProtoField.new("NTP Nanosecond", "onvif.nsec", ftypes.UINT32, nil, base.DEC_HEX)
 local ntp_clean = ProtoField.new("Clean", "onvif.c", ftypes.BOOLEAN, nil, 8, 0x80)
 local ntp_end = ProtoField.new("End", "onvif.e", ftypes.BOOLEAN, nil, 8, 0x40)
 local ntp_discon = ProtoField.new("Discon", "onvif.d", ftypes.BOOLEAN, nil, 8, 0x20)
-local ntp_mbz = ProtoField.new("MBZ", "onvif.mbz", ftypes.UINT8, nil, BASE.DEC, 0x1F)
+local ntp_mbz = ProtoField.new("MBZ", "onvif.mbz", ftypes.UINT8, nil, base.DEC, 0x1F)
 local ntp_seq = ProtoField.new("Seq", "onvif.seq", ftypes.UINT8)
 local ntp_pad = ProtoField.new("Pad", "onvif.pad", ftypes.UINT16)
+
+onvif_replay_proto.fields = {
+	ntp_sec, ntp_nsec,
+	ntp_clean, ntp_end, ntp_discon, ntp_mbz,
+	ntp_seq, ntp_pad,
+}
 
 function onvif_replay_proto.dissector(buf, pinfo, tree)
 	if buf:len() ~= 12 then return end
