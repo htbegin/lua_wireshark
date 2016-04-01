@@ -28,9 +28,17 @@ onvif_replay_proto.fields = {
 function onvif_replay_proto.dissector(buf, pinfo, tree)
 	if buf:len() ~= 12 then return end
 
+	local os = require "os"
+	local ntp_time_tbl = os.date("!*t", buf(0,4):uint())
+	local ntp_time_str = string.format(" (%02u-%02u-%02u %02u:%02u:%02u UTC)",
+									   ntp_time_tbl.year, ntp_time_tbl.month, ntp_time_tbl.day,
+									   ntp_time_tbl.hour, ntp_time_tbl.min, ntp_time_tbl.sec)
+
 	local subtree = tree:add(onvif_replay_proto, buf())
 
-	subtree:add(ntp_sec, buf(0,4))
+	local ntp_sec_item = subtree:add(ntp_sec, buf(0,4))
+	ntp_sec_item:append_text(ntp_time_str)
+
 	subtree:add(ntp_nsec, buf(4,4))
 
 	subtree:add(ntp_clean, buf(8,1))
