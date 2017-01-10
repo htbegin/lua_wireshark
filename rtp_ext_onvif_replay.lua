@@ -29,7 +29,7 @@ function onvif_replay_proto.dissector(buf, pinfo, tree)
 	if buf:len() ~= 12 then return end
 
 	local os = require "os"
-	local ntp_time_tbl = os.date("!*t", buf(0,4):uint())
+	local ntp_time_tbl = os.date("!*t", buf(0,4):uint() - 25567*24*60*60)	-- NTP time stamp epoch is 1900-01-01 while os.date() epoch is 1970-01-01 (25567 days difference)
 	local ntp_time_str = string.format(" (%02u-%02u-%02u %02u:%02u:%02u UTC)",
 									   ntp_time_tbl.year, ntp_time_tbl.month, ntp_time_tbl.day,
 									   ntp_time_tbl.hour, ntp_time_tbl.min, ntp_time_tbl.sec)
@@ -53,4 +53,3 @@ end
 
 local rtp_hdr_ext_table = DissectorTable.get("rtp.hdr_ext")
 rtp_hdr_ext_table:add(0xABAC, onvif_replay_proto)
-
